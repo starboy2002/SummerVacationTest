@@ -18,7 +18,6 @@ long quat[4];
 void MPU6050_Init(void)
 {
 	int result=0;
-	//IIC_Init();
 	result=mpu_init();
 	if(!result)
 	{	 		 
@@ -71,8 +70,7 @@ void MPU6050_Init(void)
 	}
 	else												 //MPU6050状态指示灯 STM32核心板 PC13 绿色灯亮起为不正常
 	 {
-	 GPIO_ResetBits(GPIOC, GPIO_Pin_13);				//MPU6050状态指示灯 STM32核心板 PC13 绿色灯亮起为不正常
-	 //while(1);
+		GPIO_ResetBits(GPIOC, GPIO_Pin_13);				//MPU6050状态指示灯 STM32核心板 PC13 绿色灯亮起为不正常
 	 }
 	 
 }
@@ -82,16 +80,6 @@ void MPU6050_GetData(void)
 {
 	
 	dmp_read_fifo(gyro, accel, quat, &sensor_timestamp, &sensors,&more);	 
-	/* Gyro and accel data are written to the FIFO by the DMP in chip frame and hardware units.
-	 * This behavior is convenient because it keeps the gyro and accel outputs of dmp_read_fifo and mpu_read_fifo consistent.
-	**/
-	/*if (sensors & INV_XYZ_GYRO )
-	send_packet(PACKET_TYPE_GYRO, gyro);
-	if (sensors & INV_XYZ_ACCEL)
-	send_packet(PACKET_TYPE_ACCEL, accel); */
-	/* Unlike gyro and accel, quaternions are written to the FIFO in the body frame, q30.
-	 * The orientation is set by the scalar passed to dmp_set_orientation during initialization. 
-	**/
 	if(sensors & INV_WXYZ_QUAT )
 	{
 		q0 = quat[0] / q30;	
@@ -99,9 +87,9 @@ void MPU6050_GetData(void)
 		q2 = quat[2] / q30;
 		q3 = quat[3] / q30;
 
-		Pitch = asin(-2 * q1 * q3 + 2 * q0* q2)* 57.3;	// pitch
-		Roll  = atan2(2 * q2 * q3 + 2 * q0 * q1, -2 * q1 * q1 - 2 * q2* q2 + 1)*57.3;	// roll
-		Yaw   = atan2(2*(q1*q2 + q0*q3),q0*q0+q1*q1-q2*q2-q3*q3) * 57.3;	//yaw
+		Pitch = asin(-2 * q1 * q3 + 2 * q0* q2)* 57.3;									//获得俯仰角的角度
+		Roll  = atan2(2 * q2 * q3 + 2 * q0 * q1, -2 * q1 * q1 - 2 * q2* q2 + 1)*57.3;	//获得横滚角的角度
+		Yaw   = atan2(2*(q1*q2 + q0*q3),q0*q0+q1*q1-q2*q2-q3*q3) * 57.3;				//获得偏航角的角度
     
 		
 	}

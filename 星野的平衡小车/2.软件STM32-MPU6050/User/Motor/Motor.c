@@ -1,8 +1,6 @@
 #include "stm32f10x.h"
 #include "Motor.h"
 #include "stm32f10x_exti.h"
-#define ENCODER_TIM_PERIOD (u16)0xFFFF
-#define MAX_COUNT          (u16)0x0FFF
 
 /*
   ¿ØÖÆGPIO PB12/PB13/PB14/PB15

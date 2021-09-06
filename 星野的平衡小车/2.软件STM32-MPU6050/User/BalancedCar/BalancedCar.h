@@ -6,8 +6,8 @@
 #define MOTOR_OUT_MAX           1000	   //占空比正最大值
 #define MOTOR_OUT_MIN         (-1000)   //占空比负最大值
 
-#define CAR_POSITION_MAX	 6000       //8000
-#define CAR_POSITION_MIN	(-6000)     //-8000
+#define CAR_POSITION_MAX	 4000       //8000
+#define CAR_POSITION_MIN	(-4000)     //-8000
 
 #define CAR_POSITION_SET      0
 #define CAR_SPEED_SET         0
@@ -30,7 +30,15 @@ void SpeedControl(void);
 
 extern float PS2_Speed;
 extern float PS2_Direction;
+extern float TempPS2_Direction;
+
 extern int CarState; //  1前2后3左4右0停止
+
+extern int CAR_SPEED_MAX;
+extern int CAR_SPEED_MIN;
+
+extern int SpeedLevelFlag_Forward;
+extern int SpeedLevelFlag_Turn;
 
 extern void CarStateOut(void); 
 #endif /*BalancedCar.h*/

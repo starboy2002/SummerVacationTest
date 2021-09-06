@@ -11,7 +11,13 @@
 
 int CarState = STOP; //  1前2后3左4右0停止
 
-/*角度环和速度环PID控制参数*/
+int SpeedLevelFlag_Forward = 1;
+int SpeedLevelFlag_Turn = 1;
+
+int CAR_SPEED_MAX = 4000;
+int	CAR_SPEED_MIN = -4000;
+
+/*角度环和速度环PID控制参数声明*/
 float  Angle_P =100;
 float  Angle_D =0.31;	
 
@@ -26,11 +32,11 @@ float AngleControlOut;
 float CarSpeed;							 //测速码盘得出的车速
 float CarSpeed_Old;
 
-s16   LeftMotorPulse;					  //左电机脉冲数
-s16	  RightMotorPulse;					   //右电机脉冲数
+s16   LeftMotorPulse;					   //左电机脉冲数（有符号）
+s16	  RightMotorPulse;					   //右电机脉冲数（有符号）
 
 s32   LeftMotorPulse_Add;				  //50ms左电机叠加值
-s32   RightMotorPulse_Add;				 //50ms右电机叠加值
+s32   RightMotorPulse_Add;				  //50ms右电机叠加值
 
 float CarDistance;						   //测速码盘通过计算得到的小车位移
 float SpeedControlOut;
@@ -46,7 +52,7 @@ float RightMotorOut;
 float PS2_Speed;
 float PS2_Direction;			    //用于平缓输出车速使用
 
-
+float TempPS2_Direction=400; 
 /**
  *  @brief      calculate the angle link with PD arithmetic.
  *  @param[out] none
@@ -141,9 +147,9 @@ void GetMotorPulse(void)
 	TIM_SetCounter(TIM4,0);//TIM4->CNT = 0;   //清零
 	LeftMotorPulse=TempLeft;
 	RightMotorPulse=TempRight;
-		
+	
 	LeftMotorPulse_Add  +=LeftMotorPulse;		 //脉冲值叠加 40ms叠加值
-	RightMotorPulse_Add +=RightMotorPulse; 	 //脉冲值叠加 40ms叠加值
+	RightMotorPulse_Add +=RightMotorPulse; 	 	 //脉冲值叠加 40ms叠加值
 }
 
 /**
@@ -163,8 +169,8 @@ void SpeedControl(void)
 	CarDistance += PS2_Speed;   //融合蓝牙给定速度   //融合蓝牙给定速度
 	
 	//设置积分上限设限//
-	if((s32)CarDistance > CAR_POSITION_MAX)    CarDistance = CAR_POSITION_MAX;
-	if((s32)CarDistance < CAR_POSITION_MIN)    CarDistance = CAR_POSITION_MIN;
+	if((s32)CarDistance > CAR_SPEED_MAX)    CarDistance = CAR_SPEED_MAX;
+	if((s32)CarDistance < CAR_SPEED_MIN)    CarDistance = CAR_SPEED_MIN;
 																								  
 	SpeedControlOut = (CarSpeed_Old -CAR_SPEED_SET ) * Speed_P + (CarDistance - CAR_POSITION_SET ) * Speed_I; //速度PI算法 速度*P +位移*I=速度PWM输出
 }
@@ -187,23 +193,23 @@ void CarStateOut(void)
 
 		case RUN: //向前速度 250  
 		{	
-			PS2_Speed =   3000 ;
+			PS2_Speed =   1000 ;
 		}break;	   
 
 		case LEFT://左转 
 		{
-			PS2_Direction= -400; 
+			PS2_Direction= -TempPS2_Direction; 
 		}break;  
 		
 		case RIGHT: //右转
 		{
-			PS2_Direction= 400; 
+			PS2_Direction= TempPS2_Direction; 
 
 		}break;	
 		
 		case BACK: //后退速度 -250
 		{
-			PS2_Speed = (-3000);
+			PS2_Speed = (-1000);
 		}break;		
 		
 		default: PS2_Speed = 0; break; 					   //停止

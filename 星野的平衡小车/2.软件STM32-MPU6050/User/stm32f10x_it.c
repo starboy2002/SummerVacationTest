@@ -141,15 +141,14 @@ void PendSV_Handler(void)
   * @retval None
   */
 void SysTick_Handler(void)
-{
+{			 
 	SpeedControlCount++;			  //小车速度控制调用计数值
-	GetMotorPulse();						//脉冲计算函数
+	GetMotorPulse();				  //脉冲计算函数
 	AngleControl();					  //角度PD控制PWNM输出
 	MotorOutput();					  //小车总PWM输出  
-
-	if(SpeedControlCount>=8)       //当计数值8时，即总系统运行40ms时候(每10个角度PWM输出中融入1个速度PWM输出，这样能保持速度PID输出不干扰角度PID输出，从而影响小车平衡)
+	if(SpeedControlCount>=8)          //当计数值8时，即总系统运行40ms时候(每10个角度PWM输出中融入1个速度PWM输出，这样能保持速度PID输出不干扰角度PID输出，从而影响小车平衡)
 	{	
-		SpeedControl();                     //车模速度控制函数   每40ms调用一次
+		SpeedControl();               //车模速度控制函数   每40ms调用一次
 		SpeedControlCount=0;		  //小车速度控制调用计数值清零
 	}
 }
