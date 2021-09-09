@@ -3,8 +3,8 @@
 
 #define CAR_ZERO_ANGLE 			(0)		 //初始小车车体结构导致小车存在垂直方向不为零角度的情况，固需要消除此误差，增加直立误差角度值。
 
-#define MOTOR_OUT_MAX           1000	   //占空比正最大值
-#define MOTOR_OUT_MIN         (-1000)   //占空比负最大值
+#define MOTOR_OUTPUT_MAX           1000	   //占空比正最大值
+#define MOTOR_OUTPUT_MIN         (-1000)   //占空比负最大值
 
 #define CAR_POSITION_MAX	 4000       //8000
 #define CAR_POSITION_MIN	(-4000)     //-8000

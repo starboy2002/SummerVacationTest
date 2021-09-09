@@ -81,24 +81,24 @@ static void TIM2_Mode_Config(void)
 
 	/* Time base configuration */		 
 	TIM_TimeBaseStructure.TIM_Period = 999 ;       //ARR 当定时器从0计数到999，即为1000次，为一个定时周期
-	TIM_TimeBaseStructure.TIM_Prescaler = 0;	    //设置预分频：不预分频，即为72MHz
-	TIM_TimeBaseStructure.TIM_ClockDivision = TIM_CKD_DIV1 ;	//设置时钟分频系数：不分频
+	TIM_TimeBaseStructure.TIM_Prescaler = 0;	   //设置预分频：不预分频，即为72MHz
+	TIM_TimeBaseStructure.TIM_ClockDivision = TIM_CKD_DIV1 ;	 //设置时钟分频系数：不分频
 	TIM_TimeBaseStructure.TIM_CounterMode = TIM_CounterMode_Up;  //向上计数模式
 
 	TIM_TimeBaseInit(TIM2, &TIM_TimeBaseStructure);
 
 	/* PWM2 Mode configuration: Channel3 */
-	TIM_OCInitStructure.TIM_OCMode = TIM_OCMode_PWM1;	    //配置为PWM模式1
-	TIM_OCInitStructure.TIM_OutputState = TIM_OutputState_Enable;	//比较输出使能
-	TIM_OCInitStructure.TIM_Pulse = CCR3_Val;	   //设置跳变值，当计数器计数到这个值时，电平发生跳变
-	TIM_OCInitStructure.TIM_OCPolarity = TIM_OCPolarity_High;  //当定时器计数值小于CCRX_Val时为高电平
+	TIM_OCInitStructure.TIM_OCMode = TIM_OCMode_PWM1;	          //配置为PWM模式1
+	TIM_OCInitStructure.TIM_OutputState = TIM_OutputState_Enable; //比较输出使能
+	TIM_OCInitStructure.TIM_Pulse = CCR3_Val;	                  //设置跳变值，当计数器计数到这个值时，电平发生跳变
+	TIM_OCInitStructure.TIM_OCPolarity = TIM_OCPolarity_High;     //当定时器计数值小于CCRX_Val时为高电平
 
 	TIM_OC3Init(TIM2, &TIM_OCInitStructure);	 //使能通道2
 	TIM_OC3PreloadConfig(TIM2, TIM_OCPreload_Enable);
 
 	/* PWM1 Mode configuration: Channel4 */
 	TIM_OCInitStructure.TIM_OutputState = TIM_OutputState_Enable;
-	TIM_OCInitStructure.TIM_Pulse = CCR4_Val;	  //设置通道2的电平跳变值，输出另外一个占空比的PWM
+	TIM_OCInitStructure.TIM_Pulse = CCR4_Val;	               //设置通道2的电平跳变值，输出另外一个占空比的PWM
 	TIM_OCInitStructure.TIM_OCPolarity = TIM_OCPolarity_High;  //当定时器计数值小于CCRX_Val时为高电平
 
 	TIM_OC4Init(TIM2, &TIM_OCInitStructure);	  //使能通道3

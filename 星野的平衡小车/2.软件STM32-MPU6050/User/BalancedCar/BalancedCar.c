@@ -29,16 +29,16 @@ float CarAngle;
 float AngleControlOut;
 
 /*速度环控制参数声明*/
-float CarSpeed;							 //测速码盘得出的车速
+float CarSpeed;							 
 float CarSpeed_Old;
 
 s16   LeftMotorPulse;					   //左电机脉冲数（有符号）
 s16	  RightMotorPulse;					   //右电机脉冲数（有符号）
 
-s32   LeftMotorPulse_Add;				  //50ms左电机叠加值
-s32   RightMotorPulse_Add;				  //50ms右电机叠加值
+s32   LeftMotorPulse_Add;				   //50ms左电机叠加值
+s32   RightMotorPulse_Add;				   //50ms右电机叠加值
 
-float CarDistance;						   //测速码盘通过计算得到的小车位移
+float CarDistance;						   //计算得到的小车位移
 float SpeedControlOut;
 
 int SpeedControlCount;
@@ -50,7 +50,7 @@ float RightMotorOut;
 
 /*PS2手柄控制参数声明*/
 float PS2_Speed;
-float PS2_Direction;			    //用于平缓输出车速使用
+float PS2_Direction;			    
 
 float TempPS2_Direction=400; 
 /**
@@ -61,7 +61,7 @@ float TempPS2_Direction=400;
  */
 void AngleControl(void)	 
 {
-	CarAngle = Roll - CAR_ZERO_ANGLE;													   //DMP ROLL滚动方向角度与预设小车倾斜角度值的差得出角度   
+	CarAngle = Roll - CAR_ZERO_ANGLE;		   
 	AngleControlOut =  CarAngle * Angle_P + gyro[0] * Angle_D ;	  //角度PD控制							   
 }
 
@@ -76,7 +76,7 @@ void MotorOutputAndDirection(s16 LeftValue,s16 RightValue)
 	  u16 LeftMotorOutput;
 	  u16 RightMotorOutput;
 	
-    if(LeftValue<0)			     //当左电机PWM输出为负时 PB14设为正 PB15设为负 （PB14 15 分别控制TB6612fng驱动芯片，逻辑0 1可控制左电机正转反转）
+    if(LeftValue<0)			            //当左电机PWM输出为负时 PB14设为正 PB15设为负
     {	
 	  GPIO_SetBits(GPIOB, GPIO_Pin_14 );				    
       GPIO_ResetBits(GPIOB, GPIO_Pin_15 );
@@ -105,8 +105,8 @@ void MotorOutputAndDirection(s16 LeftValue,s16 RightValue)
 	RightMotorOutput= (u16)RightValue;
 	LeftMotorOutput = (u16)LeftValue;
 
-	TIM_SetCompare3(TIM2,LeftMotorOutput);			  //TIM2与 RightMotorOutput对比，不相同则翻转波形，调节PWM占空比
-	TIM_SetCompare4(TIM2,RightMotorOutput);			  //TIM3与 LeftMotorOutput对比，不相同则翻转波形，调节PWM占空比
+	TIM_SetCompare3(TIM2,LeftMotorOutput);	 //调节左轮PWM占空比
+	TIM_SetCompare4(TIM2,RightMotorOutput);	 //调节右轮PWM占空比
 }
 
 /**
@@ -120,10 +120,10 @@ void MotorOutput(void)
 	LeftMotorOut  = AngleControlOut +SpeedControlOut + PS2_Direction;//+directionl - BST_fBluetoothDirectionNew;			//左电机转向PWM控制融合平衡角度、速度输出	
     RightMotorOut = AngleControlOut +SpeedControlOut - PS2_Direction;//-directionl+ BST_fBluetoothDirectionNew;			//右电机转向PWM控制融合平衡角度、速度输出
 
-	if((s16)LeftMotorOut  > MOTOR_OUT_MAX)	LeftMotorOut  = MOTOR_OUT_MAX;
-	if((s16)LeftMotorOut  < MOTOR_OUT_MIN)	LeftMotorOut  = MOTOR_OUT_MIN;
-	if((s16)RightMotorOut > MOTOR_OUT_MAX)	RightMotorOut = MOTOR_OUT_MAX;
-	if((s16)RightMotorOut < MOTOR_OUT_MIN)	RightMotorOut = MOTOR_OUT_MIN;
+	if((s16)LeftMotorOut  > MOTOR_OUTPUT_MAX)	LeftMotorOut  = MOTOR_OUTPUT_MAX;
+	if((s16)LeftMotorOut  < MOTOR_OUTPUT_MIN)	LeftMotorOut  = MOTOR_OUTPUT_MIN;
+	if((s16)RightMotorOut > MOTOR_OUTPUT_MAX)	RightMotorOut = MOTOR_OUTPUT_MAX;
+	if((s16)RightMotorOut < MOTOR_OUTPUT_MIN)	RightMotorOut = MOTOR_OUTPUT_MIN;
 	
     MotorOutputAndDirection((s16)LeftMotorOut,(s16)RightMotorOut);
 }
@@ -160,15 +160,15 @@ void GetMotorPulse(void)
  */
 void SpeedControl(void)
 {
-	CarSpeed = (-LeftMotorPulse_Add  - RightMotorPulse_Add ); //左右电机脉冲数平均值作为小车当前车速
-	LeftMotorPulse_Add =RightMotorPulse_Add = 0;	          //全局变量 注意及时清零		
-	CarSpeed_Old *= 0.7;
+	CarSpeed = (-LeftMotorPulse_Add  - RightMotorPulse_Add ); //左右电机脉冲数叠加值作为小车当前车速
+	LeftMotorPulse_Add =RightMotorPulse_Add = 0;	          		
+	CarSpeed_Old *= 0.7;						              //对上一次收集的速度进行一阶低通滤波处理
 	CarSpeed_Old +=CarSpeed*0.3;
 	
-	CarDistance += CarSpeed_Old; 		 //路程  即速度积分	   1/11 3:03
-	CarDistance += PS2_Speed;   //融合蓝牙给定速度   //融合蓝牙给定速度
+	CarDistance += CarSpeed_Old; 		 //速度的积分，即位移
+	CarDistance += PS2_Speed;    		 //加入PS手柄控制的速度
 	
-	//设置积分上限设限//
+	//设置速度上限
 	if((s32)CarDistance > CAR_SPEED_MAX)    CarDistance = CAR_SPEED_MAX;
 	if((s32)CarDistance < CAR_SPEED_MIN)    CarDistance = CAR_SPEED_MIN;
 																								  
@@ -191,9 +191,9 @@ void CarStateOut(void)
 			PS2_Direction=0;
 		} break; 					   
 
-		case RUN: //向前速度 250  
+		case RUN: //向前速度   
 		{	
-			PS2_Speed =   1000 ;
+			PS2_Speed = 1000 ;
 		}break;	   
 
 		case LEFT://左转 
@@ -207,12 +207,13 @@ void CarStateOut(void)
 
 		}break;	
 		
-		case BACK: //后退速度 -250
+		case BACK: //后退速度 
 		{
 			PS2_Speed = (-1000);
 		}break;		
 		
-		default: PS2_Speed = 0; break; 					   //停止
+		default: PS2_Speed = 0; 
+		break; 		
 	}
 }
 

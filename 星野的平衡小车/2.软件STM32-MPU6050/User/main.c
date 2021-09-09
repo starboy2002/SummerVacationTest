@@ -57,135 +57,122 @@ int main(void)
 	
 	//使能系统定时器
 	SysTick->CTRL|=SysTick_CTRL_ENABLE_Msk;
-		while(1)
+	while(1)
+	{
+		MPU6050_GetData();	
+		num++;
+		if(num == 200)
 		{
-			MPU6050_GetData();	
-			num++;
-			if(num == 200)
+			num =0;
+			PS2_KEY = PS2_DataKey();	 //手柄按键捕获处理
+			switch(PS2_KEY)
 			{
-				num =0;
-				PS2_KEY = PS2_DataKey();	 //手柄按键捕获处理
-				switch(PS2_KEY)
-				{
-					case PSB_SELECT: 	
-						//PrintChar("PSB_SELECT \n");  
-					    break;
-					
-					case PSB_L3:     	
-						CarState = STOP;  
-					    //PrintChar("PSB_L3 \n");  
-					    break;  
-					
-					case PSB_R3:     	
-						CarState = STOP;  
-						//PrintChar("PSB_R3 \n");  
-						break;  
-					
-					case PSB_START:  	
-						//PrintChar("PSB_START \n");  
-						break;  
-					
-					case PSB_PAD_UP: 	
-						CarState = RUN;   
-						//PrintChar("PSB_PAD_UP \n");  
-						break;  
-					
-					case PSB_PAD_RIGHT:	
-						CarState = RIGHT; 
-						//PrintChar("PSB_PAD_RIGHT \n"); 
-						break;
-					
-					case PSB_PAD_DOWN:	
-						CarState = BACK;  
-						//PrintChar("PSB_PAD_DOWN \n");  
-						break; 
-					
-					case PSB_PAD_LEFT:	
-						CarState = LEFT;  
-						//PrintChar("PSB_PAD_LEFT \n");  
-						break; 
-					
-					case PSB_L2:      	
-						CAR_SPEED_MAX-=500;
-						CAR_SPEED_MIN+=500;
-						if(CAR_SPEED_MAX<=2000)
-						{
-							CAR_SPEED_MAX = 2000;
-						}
-						if(CAR_SPEED_MIN>=-2000)
-						{
-							CAR_SPEED_MIN = -2000;
-						}
-						break;
-					
-					case PSB_R2:      	
-						TempPS2_Direction -= 50;
-						if(TempPS2_Direction<=200)
-						{
-							TempPS2_Direction = 200;
-						}
-						break;
-					
-					case PSB_L1:      	
-						CAR_SPEED_MAX+=500;
-						CAR_SPEED_MIN-=500;
-						if(CAR_SPEED_MAX>=7000)
-						{
-							CAR_SPEED_MAX = 7000;
-						}
-						if(CAR_SPEED_MIN<=-7000)
-						{
-							CAR_SPEED_MIN = -7000;
-						}
-						break; 
-					
-					case PSB_R1:      	
-						TempPS2_Direction += 50;
-						if(TempPS2_Direction>=600)
-						{
-							TempPS2_Direction = 600;
-						}
-						break;     
-					
-					case PSB_TRIAngle:	
-						CarState = STOP;  
-						break; 
-					
-					case PSB_CIRCLE:  	
-						//PrintChar("PSB_CIRCLE \n");  
-						break; 
-					
-					case PSB_CROSS:   	
-						//PrintChar("PSB_CROSS \n");  
-						break; 
-					
-					case PSB_SQUARE:  	
-						//PrintChar("PSB_SQUARE \n"); 
-						break;
-					
-					default: 
-						CarState = STOP; 
-						break; 
-						 
-				}
-				Red = PS2_RedLight();
-				X1 = PS2_AnologData(PSS_LX);
-				Y1 = PS2_AnologData(PSS_LY);
-				X2 = PS2_AnologData(PSS_RX);
-				Y2 = PS2_AnologData(PSS_RY);
-				//printf("Y1:%d\n",Y1);
-				if(Red == 1)
-				{
-					PS2_Speed = 0;
-					PS2_Direction = 0;
-					CarStateOut();
-				}
-				else
-				{	
-					PS2_Speed = -7.8*(Y1-127);
-					PS2_Direction = 3.5*(X2-128);
-				}
+				case PSB_SELECT: 	 
+					break;
+				
+				case PSB_L3:     	
+					CarState = STOP;  
+					break;  
+				
+				case PSB_R3:     	
+					CarState = STOP;    
+					break;  
+				
+				case PSB_START:  	  
+					break;  
+				
+				case PSB_PAD_UP: 	
+					CarState = RUN;   
+					break;  
+				
+				case PSB_PAD_RIGHT:	
+					CarState = RIGHT; 
+					break;
+				
+				case PSB_PAD_DOWN:	
+					CarState = BACK;  
+					break; 
+				
+				case PSB_PAD_LEFT:	
+					CarState = LEFT;    
+					break; 
+				
+				case PSB_L2:      	
+					CAR_SPEED_MAX-=500;
+					CAR_SPEED_MIN+=500;
+					if(CAR_SPEED_MAX<=2000)
+					{
+						CAR_SPEED_MAX = 2000;
+					}
+					if(CAR_SPEED_MIN>=-2000)
+					{
+						CAR_SPEED_MIN = -2000;
+					}
+					break;
+				
+				case PSB_R2:      	
+					TempPS2_Direction -= 50;
+					if(TempPS2_Direction<=200)
+					{
+						TempPS2_Direction = 200;
+					}
+					break;
+				
+				case PSB_L1:      	
+					CAR_SPEED_MAX+=500;
+					CAR_SPEED_MIN-=500;
+					if(CAR_SPEED_MAX>=7000)
+					{
+						CAR_SPEED_MAX = 7000;
+					}
+					if(CAR_SPEED_MIN<=-7000)
+					{
+						CAR_SPEED_MIN = -7000;
+					}
+					break; 
+				
+				case PSB_R1:      	
+					TempPS2_Direction += 50;
+					if(TempPS2_Direction>=600)
+					{
+						TempPS2_Direction = 600;
+					}
+					break;     
+				
+				case PSB_TRIAngle:	
+					CarState = STOP;  
+					break; 
+				
+				case PSB_CIRCLE:  	
+					break; 
+				
+				case PSB_CROSS:   	
+					break; 
+				
+				case PSB_SQUARE:  	
+					break;
+				
+				default: 
+					CarState = STOP; 
+					break; 
+			}
+			Red = PS2_RedLight();
+			X1 = PS2_AnologData(PSS_LX);
+			Y1 = PS2_AnologData(PSS_LY);
+			X2 = PS2_AnologData(PSS_RX);
+			Y2 = PS2_AnologData(PSS_RY);
+			if(Red == 1)
+			{
+				PS2_Speed = 0;
+				PS2_Direction = 0;
+				CarStateOut();
+			}
+			else
+			{	
+				PS2_Speed = -7.8*(Y1-127);
+				PS2_Direction = 3.5*(X2-128);
 			}
 		}
-	}   
+	}
+}   
 
